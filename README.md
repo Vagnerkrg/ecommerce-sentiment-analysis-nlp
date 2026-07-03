@@ -1,56 +1,77 @@
-# 🎯 Classificação Automatizada de Sentimentos em E-commerce com NLP
+# 🧠 E-commerce Sentiment Analysis with NLP & Machine Learning
 
-Este projeto implementa um pipeline completo de Processamento de Linguagem Natural (NLP) e Machine Learning para classificar e extrair inteligência de negócio a partir de avaliações de clientes de e-commerce. O modelo final alcançou uma **acurácia recorde de 91.85%**, operando com alta eficiência e pronto para integração em produção.
+Este projeto implementa um pipeline completo de Processamento de Linguagem Natural (NLP) e Machine Learning para análise de sentimentos em avaliações de clientes de e-commerce, com foco em extração de insights de negócio e classificação automática de texto em ambiente produtivo.
+
+O modelo final atingiu **91.85% de acurácia**, demonstrando alta capacidade preditiva e eficiência para aplicações reais.
 
 ---
 
-## 📊 Evolução Técnica e Engenharia de Atributos
+## 📊 Evolução do Pipeline e Engenharia de Atributos
 
-O projeto foi construído de forma iterativa, aplicando técnicas incrementais para otimização do classificador linear (*Regressão Logística*):
+O modelo foi desenvolvido de forma incremental, com refinamento contínuo das técnicas de vetorização e pré-processamento textual:
 
-1.  **Baseline (79.82%):** Vetorização inicial utilizando *Bag of Words* cru.
-2.  **Limpeza e Normalização (83.75%):** Remoção de pontuações, caracteres especiais, conversão para caixa baixa (`.lower()`) e filtragem de *Stopwords*.
-3.  **Stemming (85.11%):** Extração de radicais morfológicos utilizando o algoritmo `RSLPStemmer`, reduzindo drasticamente a esparsidade da matriz de termos.
-4.  **TF-IDF + N-grams (91.85%):** Substituição da contagem simples por ponderação estatística e introdução de Bigramas (`ngram_range=(1,2)`) para capturar contextos sequenciais e negações.
+### 1. Baseline (79.82%)
+- Vetorização inicial utilizando **Bag of Words**
+- Modelo linear como referência de performance
 
-> 🧠 **Insight de Otimização:** Testes comparativos provaram que limitar o dicionário a **1000 features** entrega a mesma acurácia do que recursos ilimitados, garantindo um modelo leve, rápido e computacionalmente eficiente para produção.
+### 2. Limpeza e Normalização (83.75%)
+- Remoção de pontuação e caracteres especiais
+- Conversão para caixa baixa (`.lower()`)
+- Filtragem de stopwords
+
+### 3. Stemming (85.11%)
+- Aplicação do `RSLPStemmer`
+- Redução da variabilidade morfológica
+- Diminuição da esparsidade da matriz de termos
+
+### 4. TF-IDF + N-grams (91.85%)
+- Aplicação de ponderação estatística (TF-IDF)
+- Inclusão de bigramas (`ngram_range=(1,2)`)
+- Captura de contexto e negações
+- Limitação do vocabulário para **1000 features**, garantindo eficiência computacional
+
+> 🧠 **Insight técnico:** A redução controlada do espaço vetorial manteve a performance do modelo, tornando-o mais leve, rápido e adequado para produção.
 
 ---
 
 ## 🗂️ Estrutura do Repositório
 
-*   `Dados/dataset_avaliacoes.csv`: Base de dados contendo o corpus de resenhas textuais.
-*   `analise_sentimentos.ipynb`: Notebook Jupyter contendo o desenvolvimento, testes e gráficos.
-*   `modelo_regressao_logistica.pkl`: Binário serializado do modelo preditivo (*Gerado via Joblib*).
-*   `tfidf_vectorizer.pkl`: Binário serializado do vetorizador calibrado de 1000 features (*Gerado via Joblib*).
-*   `.gitignore`: Configuração de segurança para impedir o upload de binários pesados (`*.pkl`).
+- `Dados/dataset_avaliacoes.csv` → Base de dados com reviews de clientes
+- `analise_sentimentos.ipynb` → Notebook principal com EDA, modelagem e testes
+- `modelo_regressao_logistica.pkl` → Modelo treinado (Joblib)
+- `tfidf_vectorizer.pkl` → Vetorizador TF-IDF treinado (1000 features)
+- `.gitignore` → Exclusão de arquivos binários e temporários
 
 ---
 
-## 🎯 Diagnóstico de Negócio (Actionable Insights)
+## 🎯 Insights de Negócio (Interpretabilidade do Modelo)
 
-Ao inspecionar os coeficientes lineares do modelo (`.nlargest()` e `.nsmallest()`), a Inteligência Artificial mapeou as principais alavancas de satisfação e gargalos operacionais da empresa:
+A análise dos coeficientes do modelo permitiu identificar os principais fatores que influenciam a satisfação dos clientes:
 
-*   **🟢 Logística Expressa (`rap`: +4.10):** A agilidade na entrega é o principal vetor para acionar reviews de 5 estrelas.
-*   **🔴 Falha Estrutural (`defeit`: -3.03 / `fragil`: -3.03):** O maior gargalo de insatisfação está atrelado a produtos que chegam danificados, gerando um vazamento de caixa severo com processos de **devolução (`devolv`: -2.93)** e **estornos de dinheiro (`dinh`: -2.70)**.
+### 🟢 Fatores Positivos
+- **Entrega rápida (`rap`)** → Forte correlação com avaliações positivas (+4.10)
+
+### 🔴 Fatores Negativos
+- **Produtos defeituosos (`defeit`, `fragil`)** → Principal causa de insatisfação (-3.03)
+- **Problemas logísticos (`devolv`)** → Impacto direto na experiência do cliente (-2.93)
+- **Estornos e reembolsos (`dinh`)** → Indicador de falhas operacionais (-2.70)
 
 ---
 
-## 🚀 Como Executar e Carregar o Modelo
+## 🚀 Execução do Modelo em Produção
 
-Como o modelo foi persistido usando a biblioteca `joblib`, você pode carregar o cérebro da IA instantaneamente em qualquer script Python para fazer inferências em tempo real, sem a necessidade de reprocessar o dataset:
+O modelo foi serializado utilizando **Joblib**, permitindo inferência instantânea sem necessidade de reprocessamento do dataset.
 
 ```python
 import joblib
 
-# Carregar os componentes de produção
-tfidf_1000 = joblib.load('tfidf_vectorizer.pkl')
-regressao_logistica = joblib.load('modelo_regressao_logistica.pkl')
+# Carregamento dos componentes do pipeline
+tfidf = joblib.load('tfidf_vectorizer.pkl')
+model = joblib.load('modelo_regressao_logistica.pkl')
 
-# Exemplo de inferência instantânea
-nova_frase = ["O produto chegou quebrado, péssima experiência!"]
-vetorizado = tfidf_1000.transform(nova_frase)
-predicao = regressao_logistica.predict(vetorizado)
+# Exemplo de inferência
+texto = ["O produto chegou quebrado e a entrega atrasou muito"]
+X = tfidf.transform(texto)
+pred = model.predict(X)
 
-print(f"Sentimento previsto: {predicao[0]}") # Output: 'negativo'
-```
+print(f"Sentimento previsto: {pred[0]}")
